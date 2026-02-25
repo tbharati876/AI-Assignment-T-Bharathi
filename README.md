@@ -61,19 +61,19 @@ Bash
 python main.py
 Note: Ensure you have replaced the NGROK_TOKEN in main.py with your personal token.
 
-### API Documentation
-POST /analyze
+## API Documentation
+### POST /analyze
 Uploads a PDF and queues a background analysis task.
 
 Input: Multipart/form-data (PDF file)
 
 Output: {"task_id": "...", "status": "Queued"}
 
-# GET /status/{task_id}
+### GET /status/{task_id}
 Retrieves the result of the analysis.
 
 Output: Returns the financial summary or PROCESSING status.
 
-# GET /docs
+### GET /docs
 Interactive Swagger UI for testing all endpoints.
 
