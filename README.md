@@ -1,3 +1,13 @@
+# Google Colab Notebook Link:
+https://colab.research.google.com/drive/1KY3PHoicIiqk0WUPFhU1WRMiesZw5w0R?usp=sharing
+
+# Video DEMO Link:
+https://drive.google.com/file/d/1aRIjZd-IsSfySq93kiNB8Arg0TpxQLM1/view?usp=sharing
+
+# Enterprise UI Link: We have to open this link after running all programs
+https://unsignifiable-tera-overbold.ngrok-free.dev/
+
+
 #  Financial Document Analyzer - VWO GenAI Debug Challenge
 
 A robust, enterprise-grade financial analysis system built with **CrewAI** and **FastAPI**. This repository serves as a successful resolution of the VWO Internship Debug Challenge, featuring local RAG (Retrieval-Augmented Generation) and asynchronous task processing.
