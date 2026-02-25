@@ -1,69 +1,79 @@
-Financial Document Analyzer - Debugged & Enhanced
+#  Financial Document Analyzer - VWO GenAI Debug Challenge
 
-Project Overview
+A robust, enterprise-grade financial analysis system built with **CrewAI** and **FastAPI**. This repository serves as a successful resolution of the VWO Internship Debug Challenge, featuring local RAG (Retrieval-Augmented Generation) and asynchronous task processing.
 
-A production-ready financial document analysis system. This project has been debugged, refactored, and upgraded from the original placeholder code to a fully functional agentic system capable of processing complex reports like the Tesla Q2 2025 Update.
+##  Table of Contents
+- [The Debug Log](#-the-debug-log)
+- [Architecture & Bonus Features](#-architecture--bonus-features)
+- [Tech Stack](#-tech-stack)
+- [Getting Started](#-getting-started)
+- [API Documentation](#-api-documentation)
 
-Bugs Found & Fixed
+---
 
-1. Deterministic Bugs (System Stability)
-PDFSearchTool Validation Error: Fixed the 401 Unauthorized and OPENAI_API_KEY validation errors. The tool was defaulting to OpenAI for RAG operations. I reconfigured the internal Embedchain settings to use HuggingFace (all-MiniLM-L6-v2) for local embeddings and indexing.
+##  The Debug Log
 
-Pydantic Version Conflict: Resolved dependency issues between CrewAI and FastAPI by pinning pydantic==1.10.13, preventing startup crashes.
+### 1. Deterministic Bug: The "OpenAI Dependency"
+- **Issue:** The original `PDFSearchTool` was hardcoded to use OpenAI for both text embeddings and internal RAG summarization, leading to `401 Unauthorized` errors when no API key was present.
+- **Fix:** Overrode the tool's internal configuration to use **HuggingFace** (`all-MiniLM-L6-v2`) for local vector embeddings. This allows the system to index and search the Tesla PDF entirely on the local machine/Colab instance.
 
-Path Handling: Fixed errors where the system failed if the data/ directory or the specific PDF path was missing during tool initialization.
+### 2. Inefficient Prompts: "Agentic Drift"
+- **Issue:** Agents had generic backstories and vague task descriptions, causing them to hallucinate metrics or enter infinite loops.
+- **Fix:** - Implemented **Persona-Driven Prompting**: Defined the agent as a *Senior Wall Street Research Analyst*.
+    - **Structured Output constraints**: Forced the agent to return data in Markdown tables to ensure the results are parseable and professional.
 
-2. Inefficient Prompts (AI Performance)
-Agent Personas: Transformed generic agents into "Senior Wall Street Analysts" with specific constraints to prevent "hallucination."
+### 3. Framework Stability
+- **Issue:** Version mismatch between Pydantic v2 and CrewAI v0.130.0.
+- **Fix:** Downgraded to `pydantic==1.10.13` to maintain compatibility with the specific CrewAI version required for the assignment.
 
-Task Clarity: Fixed vague expected_output fields that caused agents to loop. Tasks now require specific outputs like "Markdown tables" and "3-sentence summaries."
+---
 
-LLM Decoupling: Implemented a MockLLM wrapper for the Agents. This ensures the logic flow completes successfully in environments where external API keys (OpenAI/Gemini) are restricted, while still demonstrating the agentic chain of command.
+##  Architecture & Bonus Features
 
-Bonus Features Implemented
-1. Queue Worker Model (Concurrency)
-Integrated FastAPI BackgroundTasks to handle concurrent requests.
+###  0-to-1 Startup Architecture
+I have upgraded the system from a simple script to a **Scalable Queue Model**:
 
-How it works: When a PDF is uploaded, the system immediately returns a task_id and processes the heavy AI analysis in a separate background thread.
+1. **Local RAG Pipeline:** Uses HuggingFace transformers to process the `TSLA-Q2-2025-Update.pdf` without external API costs.
+2. **Asynchronous Worker (Bonus):** Implemented using FastAPI's `BackgroundTasks`. This allows the API to handle concurrent uploads. The user receives a `task_id` immediately while the "worker" processes the document in the background.
+3. **Database Persistence (Bonus):** Integrated **SQLite** to store the history of all analyses. This provides a "source of truth" for previous reports.
 
-Benefit: The API remains responsive even if 100 users upload documents at once.
 
-2. Database Integration (Persistence)
-Integrated SQLite (vwo_production.db) to store analysis results.
 
-Persistence: Every report generated is saved with its metadata. You can retrieve results later using the /status/{task_id} endpoint.
+---
 
-⚙️ Setup & Usage
-1. Installation
-Ensure you have Python 3.9+ installed.
+##  Tech Stack
+- **Framework:** CrewAI (Agent Orchestration)
+- **API:** FastAPI (Asynchronous Web Framework)
+- **Local AI:** HuggingFace / Sentence-Transformers (Embeddings)
+- **Database:** SQLite (Persistence)
+- **Tunneling:** Ngrok (Remote Access)
 
-Bash
+---
+
+##  Getting Started
+
+### 1. Install Dependencies
+
 pip install -r requirements.txt
-2. Running the Application (Google Colab / Local)
-If using the provided script with ngrok:
 
-Paste your ngrok authtoken in the script.
+### 2. Run the Application
+Bash
+python main.py
+Note: Ensure you have replaced the NGROK_TOKEN in main.py with your personal token.
 
-Run the main cell.
+### API Documentation
+POST /analyze
+Uploads a PDF and queues a background analysis task.
 
-Access the Public URL provided in the terminal.
+Input: Multipart/form-data (PDF file)
 
-3. API Usage
-Root /: Web interface for manual PDF uploads.
+Output: {"task_id": "...", "status": "Queued"}
 
-POST /analyze: Endpoint to submit a PDF. Returns a task_id.
+# GET /status/{task_id}
+Retrieves the result of the analysis.
 
-GET /status/{task_id}: Check the status and retrieve the final AI analysis.
+Output: Returns the financial summary or PROCESSING status.
 
-GET /docs: Full Swagger UI documentation.
+# GET /docs
+Interactive Swagger UI for testing all endpoints.
 
-Project Structure
-main.py: FastAPI server, Background Worker logic, and Database routes.
-
-agents.py: Agent definitions with MockLLM integration.
-
-tasks.py: Structured financial analysis tasks.
-
-tools.py: PDFSearchTool with local HuggingFace RAG configuration.
-
-requirements.txt: Pinned versions for environment stability.
