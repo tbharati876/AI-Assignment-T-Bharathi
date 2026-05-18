@@ -16,7 +16,7 @@ from crewai import Agent, Task, Crew, Process
 
 #  1. SETUP
 nest_asyncio.apply()
-NGROK_TOKEN = "36mSHpSl4DWk4VZO6zTudKO3Piz_2ReYvKNYAz8zPKgUJRMxH"
+NGROK_TOKEN = "PASTE_NGROK_TOKEN_HERE"
 ngrok.set_auth_token(NGROK_TOKEN)
 app = FastAPI(title="VWO Bonus - Queue & DB")
 
